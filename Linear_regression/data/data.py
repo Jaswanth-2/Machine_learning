@@ -1,10 +1,15 @@
-from sklearn.datasets import load_diabetes
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
+import random
+import math
 
-def load_data():
-    data=load_diabetes()
-    x=pd.DataFrame(data.data,columns=data.feature_names)
-    y=pd.Series(data.target,name='target')
-    return x,y
+random.seed(42)
+
+TRUE_W = 3.0
+TRUE_B = 7.0
+N_SAMPLES = 100
+
+X = [random.uniform(0, 10) for _ in range(N_SAMPLES)]
+y = [TRUE_W * x + TRUE_B + random.gauss(0, 2.0) for x in X]
+
+print(f"Generated {N_SAMPLES} samples")
+print(f"True relationship: y = {TRUE_W}x + {TRUE_B} (+ noise)")
+print(f"First 5 points: {[(round(X[i], 2), round(y[i], 2)) for i in range(5)]}")
