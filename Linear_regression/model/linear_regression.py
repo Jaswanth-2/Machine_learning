@@ -1,32 +1,50 @@
+from data_generator import TRUE_W,TRUE_B,X,y
+
 class LinearRegression:
+    def __init__(self, learning_rate=0.01):
+        self.w = 0.0
+        self.b = 0.0
+        self.lr = learning_rate
+        self.cost_history = []
 
-    def __init__(self):
-        self.slope=0
-        self.intercept=0
-    
-    def fit(self,x,y):
-        mean_x=sum(x)/len(x)
-        mean_y=sum(y)/len(y)
-        print("Mean X:",mean_x)
-        print("Mean_y :",mean_y)
+    def predict(self, X):
+        return [self.w * x + self.b for x in X]
 
-        varience=0
-        for value in x:
-            varience += (value - mean_x) **2
-        print("Vrience", varience)
+    def compute_cost(self, X, y):
+        predictions = self.predict(X)
+        n = len(y)
+        cost = sum((pred - actual) ** 2 for pred, actual in zip(predictions, y)) / n
+        return cost
 
-        covariance =0
-        for x_value,y_value in zip(x,y):
-            covariance += (x_value - mean_x)*(y_value - mean_x)
-        print("Covarience",covariance)
+    def compute_gradients(self, X, y):
+        predictions = self.predict(X)
+        n = len(y)
+        dw = (2 / n) * sum((pred - actual) * x for pred, actual, x in zip(predictions, y, X))
+        db = (2 / n) * sum(pred - actual for pred, actual in zip(predictions, y))
+        return dw, db
 
-        self.slope=covariance/varience
-        self.intercept=mean_y - self.slope * mean_x
+    def fit(self, X, y, epochs=1000, print_every=200):
+        for epoch in range(epochs):
+            dw, db = self.compute_gradients(X, y)
+            self.w -= self.lr * dw
+            self.b -= self.lr * db
+            cost = self.compute_cost(X, y)
+            self.cost_history.append(cost)
+            if epoch % print_every == 0:
+                print(f"  Epoch {epoch:4d} | Cost: {cost:.4f} | w: {self.w:.4f} | b: {self.b:.4f}")
+        return self
 
-    def predict(self,x):
-        prediction=[]
+    def r_squared(self, X, y):
+        predictions = self.predict(X)
+        y_mean = sum(y) / len(y)
+        ss_res = sum((actual - pred) ** 2 for actual, pred in zip(y, predictions))
+        ss_tot = sum((actual - y_mean) ** 2 for actual in y)
+        return 1 - (ss_res / ss_tot)
 
-        for value in x:
-            y_pred=self.slope * value +self.intercept
-            prediction.append(y_pred)
-        return prediction
+
+print("=== Training Linear Regression (Gradient Descent) ===")
+model = LinearRegression(learning_rate=0.005)
+model.fit(X, y, epochs=1000, print_every=200)
+print(f"\nLearned: y = {model.w:.4f}x + {model.b:.4f}")
+print(f"True:    y = {TRUE_W}x + {TRUE_B}")
+print(f"R-squared: {model.r_squared(X, y):.4f}")
