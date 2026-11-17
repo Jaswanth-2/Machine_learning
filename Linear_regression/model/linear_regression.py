@@ -1,4 +1,4 @@
-from data_generator import TRUE_W,TRUE_B,X,y
+
 
 class LinearRegression:
     def __init__(self, learning_rate=0.01):
